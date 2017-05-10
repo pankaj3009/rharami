@@ -3,6 +3,7 @@ library(RTrade)
 library(TTR)
 library(candlesticks)
 library(log4r)
+library(data.table)
 options(scipen=999)
 
 
@@ -241,6 +242,7 @@ if(nrow(signals)>0){
         }
         
         if(nrow(trades)>0){
+                trades$reason<-"HaramiLong"
                 trades$size=NULL
                 novalue=strptime(NA_character_,"%Y-%m-%d")
                 for(i in 1:nrow(trades)){
@@ -421,6 +423,7 @@ if(nrow(signals)>0){
         }
         
         if(nrow(shorttrades)>0){
+                shorttrades$reason<-"HaramiShort"
                 shorttrades$size=NULL
                 novalue=strptime(NA_character_,"%Y-%m-%d")
                 for(i in 1:nrow(shorttrades)){
@@ -603,6 +606,7 @@ if(nrow(signals)>0){
         }
         
         if(nrow(shorttrades)>0){
+                shorttrades$reason<-"DojiLong"
                 shorttrades$size=NULL
                 novalue=strptime(NA_character_,"%Y-%m-%d")
                 for(i in 1:nrow(shorttrades)){
@@ -785,6 +789,7 @@ if(nrow(signals)>0){
         }
         
         if(nrow(shorttrades)>0){
+                shorttrades$reason<-"DojiShort"
                 shorttrades$size=NULL
                 novalue=strptime(NA_character_,"%Y-%m-%d")
                 for(i in 1:nrow(shorttrades)){
@@ -967,6 +972,7 @@ if(nrow(signals)>0){
         }
         
         if(nrow(shorttrades)>0){
+                shorttrades$reason<-"HammerLong"
                 shorttrades$size=NULL
                 novalue=strptime(NA_character_,"%Y-%m-%d")
                 for(i in 1:nrow(shorttrades)){
@@ -1149,6 +1155,7 @@ if(nrow(signals)>0){
         }
         
         if(nrow(shorttrades)>0){
+                shorttrades$reason<-"HammerShort"
                 shorttrades$size=NULL
                 novalue=strptime(NA_character_,"%Y-%m-%d")
                 for(i in 1:nrow(shorttrades)){
@@ -1199,6 +1206,10 @@ winratio<-sum(trades$absolutepnl>0)/nrow(trades)
 absolutepnl<-sum(trades$absolutepnl)
 print(paste("abs pnl",absolutepnl,sep=":"))
 print(paste("win ratio",winratio*100,sep=":"))
+dt<-data.table(trades)
+trades.summary <- dt[, list(TotalReturn=sum(absolutepnl), WinRatio=sum(absolutepnl>0)/length(absolutepnl),TradesCount=length(absolutepnl)),by=c("reason")]
+trades.summary<-trades.summary[order(reason),]
+print(trades.summary)
 
 ########### SAVE SIGNALS TO REDIS #################
 
