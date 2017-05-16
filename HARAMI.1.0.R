@@ -3,7 +3,7 @@ library(RTrade)
 library(TTR)
 library(candlesticks)
 library(log4r)
-library(data.table)
+library(dplyr)
 options(scipen=999)
 
 
@@ -196,7 +196,7 @@ if(nrow(signals)>0){
                 out
         }
         a <- multisymbol(signals,dates)
-        processedsignals <- ApplySLTP(a, rep(a$asettle*0.10, nrow(a)),rep(a$asettle, nrow(a)))
+        processedsignals <- ApplySLTP(a, rep(a$asettle*0.10, nrow(a)),rep(a$asettle, nrow(a)),preventReplacement=TRUE)
         processedsignals <- processedsignals[order(processedsignals$date), ]
         processedsignals$currentmonthexpiry <- as.Date(sapply(processedsignals$date, getExpiryDate), tz = kTimeZone)
         nextexpiry <- as.Date(sapply(
@@ -1206,9 +1206,8 @@ winratio<-sum(trades$absolutepnl>0)/nrow(trades)
 absolutepnl<-sum(trades$absolutepnl)
 print(paste("abs pnl",absolutepnl,sep=":"))
 print(paste("win ratio",winratio*100,sep=":"))
-dt<-data.table(trades)
-trades.summary <- dt[, list(TotalReturn=sum(absolutepnl), WinRatio=sum(absolutepnl>0)/length(absolutepnl),TradesCount=length(absolutepnl)),by=c("reason")]
-trades.summary<-trades.summary[order(reason),]
+trades.dplyr<-group_by(trades,reason)
+trades.summary<-summarise(trades.dplyr,tradecount=n(),profit=sum(absolutepnl),winratio=sum(absolutepnl>0)/n())
 print(trades.summary)
 
 ########### SAVE SIGNALS TO REDIS #################
