@@ -94,8 +94,8 @@ symbolchange$newsymbol = gsub("[^0-9A-Za-z/-]", "", symbolchange$newsymbol)
 redisClose()
 
 niftysymbols <-
-        createIndexConstituents(2, "nifty50", threshold = "2015-01-01")
-folots <- createFNOSize(2, "contractsize", threshold = "2015-01-01")
+        createIndexConstituents(2, "nifty50", threshold = "2013-01-01")
+folots <- createFNOSize(2, "contractsize", threshold = "2013-01-01")
 
 invalidsymbols = numeric()
 endtime = format(Sys.time(), format = "%Y-%m-%d %H:%M:%S")
